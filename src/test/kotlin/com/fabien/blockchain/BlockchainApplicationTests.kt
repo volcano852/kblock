@@ -27,11 +27,11 @@ class BlockchainApplicationTests {
 
         val t1 = Transaction(fabien.public, virginie.public, 100.0)
         val t1Random = 1L
-        t1Signed = SignedTransaction(t1, signTransaction(t1, fabien.private, t1Random), t1Random)
+        t1Signed = SignedTransaction(t1, Transaction.sign(t1, fabien.private, t1Random), t1Random)
 
         val t2 = Transaction(virginie.public, fabien.public, 25.0)
         val t2Random = 2L
-        t2Signed = SignedTransaction(t1, signTransaction(t2, virginie.private, t2Random), t2Random)
+        t2Signed = SignedTransaction(t1, Transaction.sign(t2, virginie.private, t2Random), t2Random)
     }
 
     @Test

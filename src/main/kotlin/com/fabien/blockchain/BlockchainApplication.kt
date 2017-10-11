@@ -110,6 +110,15 @@ object Blockchain {
 }
 
 open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: PublicKey, val amount: Double) {
+    companion object {
+        fun sign(transaction: Transaction, privateKey: PrivateKey, random: Long): ByteArray {
+            val signature = Signature.getInstance("SHA256withRSA")
+            signature.initSign(privateKey)
+            signature.update(transaction.toJsonByteArray())
+            return signature.sign()
+        }
+    }
+
     fun toJsonByteArray() : ByteArray {
         val mapper = jacksonObjectMapper()
         val node = JsonNodeFactory.instance.objectNode()
@@ -118,13 +127,6 @@ open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: Pub
         node.put("amount",amount)
         return mapper.writeValueAsBytes(node)
     }
-}
-
-fun signTransaction(transaction: Transaction, privateKey: PrivateKey, random: Long): ByteArray {
-    val signature = Signature.getInstance("SHA256withRSA")
-    signature.initSign(privateKey)
-    signature.update(transaction.toJsonByteArray())
-    return signature.sign()
 }
 
 class SignedTransaction(transaction: Transaction, val signature: ByteArray,val random: Long) : Transaction(transaction.publicKeySender, transaction.pubicKeyReceiver, transaction.amount) {
