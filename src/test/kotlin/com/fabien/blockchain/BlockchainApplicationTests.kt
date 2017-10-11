@@ -2,7 +2,8 @@ package com.fabien.blockchain
 
 import com.google.common.base.Stopwatch
 import org.junit.Assert.assertEquals
-import org.junit.BeforeClass
+import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -12,21 +13,25 @@ import java.util.concurrent.TimeUnit
 //@SpringBootTest
 class BlockchainApplicationTests {
 
-    lateinit var fabien: KeyPair
-    lateinit var virginie: KeyPair
+    val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
+    var fabien: KeyPair = keyPairGenerator.genKeyPair()
+    var virginie: KeyPair = keyPairGenerator.genKeyPair()
     lateinit var t1Signed: SignedTransaction
     lateinit var t2Signed: SignedTransaction
 
-    @BeforeClass
+    @Before
     fun generateKeysPairsAndTransactions() {
         val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
         fabien = keyPairGenerator.genKeyPair()
         virginie = keyPairGenerator.genKeyPair()
 
         val t1 = Transaction(fabien.public, virginie.public, 100.0)
-        t1Signed = SignedTransaction(t1, signTransaction(t1, fabien.private))
+        val t1Random = 1L
+        t1Signed = SignedTransaction(t1, signTransaction(t1, fabien.private, t1Random), t1Random)
+
         val t2 = Transaction(virginie.public, fabien.public, 25.0)
-        t2Signed = SignedTransaction(t1, signTransaction(t2, virginie.private))
+        val t2Random = 2L
+        t2Signed = SignedTransaction(t1, signTransaction(t2, virginie.private, t2Random), t2Random)
     }
 
     @Test
@@ -48,6 +53,7 @@ class BlockchainApplicationTests {
     }
 
     @Test
+    @Ignore
     fun measure_hashing_performance() {
         val sw = Stopwatch.createStarted()
 

@@ -1,5 +1,7 @@
 package com.fabien.blockchain
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.hash.Funnel
 import com.google.common.hash.Hashing
 import java.security.PrivateKey
@@ -107,16 +109,25 @@ object Blockchain {
     }
 }
 
-open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: PublicKey, val amount: Double)
+open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: PublicKey, val amount: Double) {
+    fun toJsonByteArray() : ByteArray {
+        val mapper = jacksonObjectMapper()
+        val node = JsonNodeFactory.instance.objectNode()
+        node.put("sender",publicKeySender.encoded)
+        node.put("receiver",pubicKeyReceiver.encoded)
+        node.put("amount",amount)
+        return mapper.writeValueAsBytes(node)
+    }
+}
 
-fun signTransaction(transaction: Transaction, privateKey: PrivateKey): ByteArray {
+fun signTransaction(transaction: Transaction, privateKey: PrivateKey, random: Long): ByteArray {
     val signature = Signature.getInstance("SHA256withRSA")
     signature.initSign(privateKey)
-    signature.update(transaction as ByteArray)
+    signature.update(transaction.toJsonByteArray())
     return signature.sign()
 }
 
-class SignedTransaction(transaction: Transaction, val signature: ByteArray) : Transaction(transaction.publicKeySender, transaction.pubicKeyReceiver, transaction.amount) {
+class SignedTransaction(transaction: Transaction, val signature: ByteArray,val random: Long) : Transaction(transaction.publicKeySender, transaction.pubicKeyReceiver, transaction.amount) {
     fun verifySignature(): Boolean {
         val signatureInst = Signature.getInstance("SHA256withRSA")
         signatureInst.initVerify(this.publicKeySender)
