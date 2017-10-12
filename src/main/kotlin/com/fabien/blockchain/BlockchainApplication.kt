@@ -119,7 +119,7 @@ open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: Pub
         }
     }
 
-    fun toJsonByteArray() : ByteArray {
+    protected fun toJsonByteArray() : ByteArray {
         val mapper = jacksonObjectMapper()
         val node = JsonNodeFactory.instance.objectNode()
         node.put("sender",publicKeySender.encoded)
@@ -133,7 +133,7 @@ class SignedTransaction(transaction: Transaction, val signature: ByteArray,val r
     fun verifySignature(): Boolean {
         val signatureInst = Signature.getInstance("SHA256withRSA")
         signatureInst.initVerify(this.publicKeySender)
-        signatureInst.update(this as ByteArray)
+        signatureInst.update(this.toJsonByteArray())
         return signatureInst.verify(this.signature)
     }
 }

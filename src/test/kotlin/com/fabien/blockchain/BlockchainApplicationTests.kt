@@ -1,7 +1,9 @@
 package com.fabien.blockchain
 
 import com.google.common.base.Stopwatch
+import org.hamcrest.Matchers.greaterThanOrEqualTo
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -47,9 +49,10 @@ class BlockchainApplicationTests {
     fun test_correct_guess_results_in_leading_zeros() {
         Blockchain.addTransaction(t1Signed)
         Blockchain.addTransaction(t2Signed)
-        val hash = Blockchain.hashBlock(fabien.public, 1612657619380781199)
+        val (guess,count)= Blockchain.mineTransactions(fabien.public)
+        val hash = Blockchain.hashBlock(fabien.public, guess)
         val actualZeros = Blockchain.leadingZeroBits(hash)
-        assertEquals(6, actualZeros)
+        assertThat(actualZeros,greaterThanOrEqualTo(Blockchain.proofDifficulty))
     }
 
     @Test
