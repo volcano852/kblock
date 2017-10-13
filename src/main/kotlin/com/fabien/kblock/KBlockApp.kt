@@ -48,6 +48,7 @@ object Blockchain {
     data class MiningResult(val guess: Long, val counter: Long)
 
     fun mineTransactions(contributor: PublicKey, counterStatus: Int = 0, displayStatus: ((counter: Long) -> Unit) = {}): MiningResult {
+
         var counter: Long = 0
         var guess: Long
         do {
@@ -67,7 +68,7 @@ object Blockchain {
             for (t in transactions) {
                 sink
                         ?.putBytes(t?.publicKeySender.encoded)
-                        ?.putBytes(t?.pubicKeyReceiver.encoded)
+                        ?.putBytes(t?.publicKeyReceiver.encoded)
                         ?.putDouble(t?.amount!!)
                         ?.putBytes(t?.signature)
             }
@@ -115,7 +116,7 @@ object Blockchain {
     }
 }
 
-open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: PublicKey, val amount: Double) {
+open class Transaction(val publicKeySender: PublicKey, val publicKeyReceiver: PublicKey, val amount: Double) {
     companion object {
         fun sign(transaction: Transaction, privateKey: PrivateKey, random: Long): ByteArray {
             val signature = Signature.getInstance("SHA256withRSA")
@@ -129,7 +130,7 @@ open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: Pub
         val mapper = jacksonObjectMapper()
         val node = JsonNodeFactory.instance.objectNode()
         node.put("sender",publicKeySender.encoded)
-        node.put("receiver",pubicKeyReceiver.encoded)
+        node.put("receiver", publicKeyReceiver.encoded)
         node.put("amount",amount)
         return mapper.writeValueAsBytes(node)
     }
@@ -150,7 +151,7 @@ class SignedTransaction(publicKeySender: PublicKey, pubicKeyReceiver: PublicKey,
 }
 
 class Block(val index: Long,
-            val transactions: List<Transaction>,
+            val transactions: List<SignedTransaction>,
             val contributor: PublicKey, // TODO: check if not in bitcoin blockchain ?
             val proof: Long,
             val previousHash: ByteArray) {
