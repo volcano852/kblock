@@ -1,4 +1,4 @@
-package com.fabien.blockchain
+package com.fabien.kblock
 
 import com.google.common.base.Stopwatch
 import org.hamcrest.Matchers.greaterThanOrEqualTo

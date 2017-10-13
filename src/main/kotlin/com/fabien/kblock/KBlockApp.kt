@@ -1,9 +1,11 @@
-package com.fabien.blockchain
+package com.fabien.kblock
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.hash.Funnel
 import com.google.common.hash.Hashing
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.Signature
@@ -11,8 +13,13 @@ import java.time.LocalDateTime
 import java.util.concurrent.ThreadLocalRandom
 
 
-//@SpringBootApplication
-//class BlockchainApplication
+@SpringBootApplication
+class KBlockApp
+
+fun main(args: Array<String>) {
+    SpringApplication.run(KBlockApp::class.java, *args)
+}
+
 
 /*
                         ### NOTES ###
@@ -20,7 +27,6 @@ import java.util.concurrent.ThreadLocalRandom
 2. Is adding one zero of complexity really double up the time in bitcoin ? (difficulty -> avg hashes : 2 -> 7,3 -> 15, 4->32, 5->65)
 3. my laptop hash capacity: 127960366 hashes in 66 sec. 1_938_793 hash/sec ~ 1.9MHash/sec
 4. What is the timestamp protocol used in bitcoin ?
-5. Is transaction in blockchain only about user give to another user (owing/giving money)
 6. Is the minor/contributor put in the block ? Do we keep track of the minor in the hash (and is it being hashed?)
 */
 
@@ -28,7 +34,7 @@ import java.util.concurrent.ThreadLocalRandom
 object Blockchain {
     const val proofDifficulty = 6
 
-    private val chain = mutableListOf<Block>()
+    val chain = mutableListOf<Block>()
 
     val transactions = mutableListOf<SignedTransaction>()
 
@@ -129,7 +135,12 @@ open class Transaction(val publicKeySender: PublicKey, val pubicKeyReceiver: Pub
     }
 }
 
-class SignedTransaction(transaction: Transaction, val signature: ByteArray,val random: Long) : Transaction(transaction.publicKeySender, transaction.pubicKeyReceiver, transaction.amount) {
+class SignedTransaction(publicKeySender: PublicKey, pubicKeyReceiver: PublicKey, amount: Double, val signature: ByteArray,val random: Long)
+    : Transaction(publicKeySender, pubicKeyReceiver, amount) {
+
+    constructor(transaction: Transaction, signature: ByteArray,random: Long)
+            : this(transaction.publicKeySender,transaction.publicKeySender,transaction.amount,signature,random)
+
     fun verifySignature(): Boolean {
         val signatureInst = Signature.getInstance("SHA256withRSA")
         signatureInst.initVerify(this.publicKeySender)
