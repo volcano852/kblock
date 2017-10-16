@@ -5,6 +5,24 @@
 - The mining difficulty is constant and initialized at the blockchain instantiation
 - The mining reward is systematic and constant. The transaction sender cannot leave transaction fee at this stage
 
+## RSA Key CLI
+
+1. Generating key pairs
+
+```shell
+ssh-keygen
+```
+
+2. Convert PEM private to PKCS8 private
+```shell
+openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in id_rsa -out id_rsa.p8
+```
+
+3. (Optional) Display key details
+```shell
+openssl rsa -in id_rsa -noout -text
+```
+
 ## Personal working notes
 
 1. What is the current bitcoin leading zeros complexity ?
