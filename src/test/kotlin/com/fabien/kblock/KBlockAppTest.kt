@@ -14,6 +14,7 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.util.concurrent.TimeUnit
 
+
 //@RunWith(SpringRunner::class)
 //@SpringBootTest
 class KBlockAppTest {
@@ -38,6 +39,11 @@ class KBlockAppTest {
         val t2 = Transaction(virginie.public, fabien.public, 25.0)
         t2Signed = SignedTransaction(t2, Transaction.sign(t2, virginie.private))
         kblock.transactions.add(t2Signed)
+    }
+
+    @Test
+    fun `test unsigned transaction`() {
+//        val publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(bytes))
     }
 
     @Test

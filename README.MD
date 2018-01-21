@@ -18,9 +18,9 @@ ssh-keygen
 openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in id_rsa -out id_rsa.p8
 ```
 
-3. (Optional) Display key details
+3. Extract public key from the private key
 ```shell
-openssl rsa -in id_rsa -noout -text
+openssl rsa -in id-rsa -pubout -outform DER -out id_rsa.p8.pub
 ```
 
 ## Personal working notes

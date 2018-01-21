@@ -1,4 +1,4 @@
-package com.fabien.kblock.web
+package com.fabien.kblock.interfaces.web
 
 import com.fabien.kblock.domain.model.SignedTransaction
 import com.fabien.kblock.domain.model.Transaction

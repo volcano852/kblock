@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import java.io.File
+import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.Signature
+import java.security.spec.X509EncodedKeySpec
 import java.util.*
+
+
 
 class Transaction(val publicKeySender: PublicKey, val publicKeyReceiver: PublicKey, val amount: Double) {
     companion object {
@@ -17,6 +22,20 @@ class Transaction(val publicKeySender: PublicKey, val publicKeyReceiver: PublicK
             signatureInst.initSign(privateKey)
             signatureInst.update(transaction.toJsonByteArray())
             return signatureInst.sign()
+        }
+
+        fun fromFile(filename: String): Transaction {
+            val node = jacksonObjectMapper().readTree(File(filename))
+
+            val sender = Base64.getDecoder().decode(node.get("sender").textValue())
+            val senderKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(sender))
+
+            val receiver = Base64.getDecoder().decode(node.get("receiver").textValue())
+            val receiverKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(receiver))
+
+            val amount = node.get("amount").doubleValue()
+
+            return Transaction(senderKey,receiverKey,amount)
         }
     }
 
